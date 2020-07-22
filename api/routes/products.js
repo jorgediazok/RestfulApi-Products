@@ -6,7 +6,13 @@ const Product = require('../models/Product');
 router.get('/', async (req, res) => {
   try {
     const product = await Product.find();
-    res.status(200).json(product);
+    if (product.length > 0) {
+      res.status(200).json(product);
+    } else {
+      res.status(404).json({
+        message: 'No products found',
+      });
+    }
   } catch {
     (err) => {
       console.log(err);
@@ -52,16 +58,34 @@ router.get('/:productId', async (req, res) => {
   }
 });
 
-router.patch('/:productId', (req, res) => {
-  res.status(200).json({
-    message: 'UPDATED PRODUCT',
-  });
+router.patch('/:productId', async (req, res) => {
+  try {
+    const id = req.params.productId;
+    const updateOps = {};
+    for (const ops of req.body) {
+      updateOps[ops.propName] = ops.value;
+    }
+    const product = await Product.update({ _id: id }, { $set: updateOps });
+    res.status(200).json(product);
+  } catch {
+    (err) => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    };
+  }
 });
 
-router.delete('/:productId', (req, res) => {
-  res.status(200).json({
-    message: 'DELETED PRODUCT',
-  });
+router.delete('/:productId', async (req, res) => {
+  try {
+    const id = req.params.productId;
+    const product = await Product.remove({ _id: id });
+    res.status(200).json(product);
+  } catch {
+    (err) => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    };
+  }
 });
 
 module.exports = router;
