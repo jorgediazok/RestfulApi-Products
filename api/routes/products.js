@@ -3,10 +3,18 @@ const router = express.Router();
 
 const Product = require('../models/Product');
 
-router.get('/', (req, res) => {
-  res.status(200).json({
-    message: 'Handling GET Request to /products',
-  });
+router.get('/', async (req, res) => {
+  try {
+    const product = await Product.find();
+    res.status(200).json(product);
+  } catch {
+    (err) => {
+      console.log(err);
+      res.status(500).json({
+        message: 'ERROR',
+      });
+    };
+  }
 });
 
 router.post('/', async (req, res) => {
@@ -32,8 +40,10 @@ router.post('/', async (req, res) => {
 
 router.get('/:productId', async (req, res) => {
   try {
-    let response = await Product.findById({});
-    res.status(200).json({ response });
+    const id = req.params.productId;
+    const product = await Product.findById(id);
+    console.log('from the database', product);
+    res.status(200).json(product);
   } catch {
     (err) => {
       console.log(err);
