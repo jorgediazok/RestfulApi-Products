@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
 
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 
-router.get('/', async (req, res) => {
+router.get('/', checkAuth, async (req, res) => {
   try {
     const order = await Order.find().select('product quantity _id');
     res.status(200).json({
@@ -32,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', checkAuth, async (req, res) => {
   try {
     const product = Product.findById(req.body.productId);
     if (!product) {
@@ -68,7 +69,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:orderId', async (req, res) => {
+router.get('/:orderId', checkAuth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
     if (!order) {
@@ -93,7 +94,7 @@ router.get('/:orderId', async (req, res) => {
   }
 });
 
-router.delete('/:orderId', async (req, res) => {
+router.delete('/:orderId', checkAuth, async (req, res) => {
   try {
     await Order.remove({ _id: req.params.orderId });
     res.status(200).json({

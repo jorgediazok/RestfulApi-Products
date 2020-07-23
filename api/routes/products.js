@@ -4,6 +4,11 @@ const router = express.Router();
 //multer to upload images
 
 const multer = require('multer');
+
+//JWT VERIFY
+const checkAuth = require('../middleware/check-auth');
+
+//FIRST OF ALL MULTER UPLOAD IMAGE
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './uploads/');
@@ -64,7 +69,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', upload.single('productImage'), async (req, res) => {
+router.post('/', checkAuth, upload.single('productImage'), async (req, res) => {
   try {
     console.log(req.file);
     const product = await new Product({
@@ -118,7 +123,7 @@ router.get('/:productId', async (req, res) => {
   }
 });
 
-router.patch('/:productId', async (req, res) => {
+router.patch('/:productId', checkAuth, async (req, res) => {
   try {
     const id = req.params.productId;
     const updateOps = {};
@@ -142,7 +147,7 @@ router.patch('/:productId', async (req, res) => {
   }
 });
 
-router.delete('/:productId', async (req, res) => {
+router.delete('/:productId', checkAuth, async (req, res) => {
   try {
     const id = req.params.productId;
     const product = await Product.remove({ _id: id });
