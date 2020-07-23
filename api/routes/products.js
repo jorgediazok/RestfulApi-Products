@@ -6,25 +6,39 @@ const router = express.Router();
 const multer = require('multer');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads/');
+    cb(null, '/uploads/');
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
   },
 });
-const upload = multer({ storage: storage });
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 },
+  fileFilter: fileFilter,
+});
 
 const Product = require('../models/Product');
 
 router.get('/', async (req, res) => {
   try {
-    const product = await Product.find().select('name price _id');
+    const product = await Product.find().select('name price _id productImage');
     const response = {
       count: product.length,
       products: product.map((prod) => {
         return {
           name: prod.name,
           price: prod.price,
+          productImage: prod.productImage,
           _id: prod._id,
           request: {
             type: 'GET',
@@ -56,6 +70,7 @@ router.post('/', upload.single('productImage'), async (req, res) => {
     const product = await new Product({
       name: req.body.name,
       price: req.body.price,
+      productImage: req.file.path,
     });
     await product.save();
     res.status(201).json({
@@ -63,6 +78,7 @@ router.post('/', upload.single('productImage'), async (req, res) => {
       createdProduct: {
         name: product.name,
         price: product.price,
+        productImage: product.productImage,
         id: product._id,
         request: {
           type: 'POST',
@@ -83,7 +99,9 @@ router.post('/', upload.single('productImage'), async (req, res) => {
 router.get('/:productId', async (req, res) => {
   try {
     const id = req.params.productId;
-    const product = await Product.findById(id).select('name price _id');
+    const product = await Product.findById(id).select(
+      'name price _id productImage'
+    );
     res.status(200).json({
       product: product,
       request: {
