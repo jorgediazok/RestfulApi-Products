@@ -9,6 +9,7 @@ require('./database');
 
 const productRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 //Middlewares
 app.use(morgan('dev'));
@@ -21,6 +22,7 @@ app.use(cors());
 //Routes that handle requests
 app.use('/products', productRoutes);
 app.use('/orders', ordersRoutes);
+app.use('/user', userRoutes);
 
 //Errors handlers
 
