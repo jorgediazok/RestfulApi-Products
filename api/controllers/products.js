@@ -1,6 +1,8 @@
 const Product = require('../models/Product');
 const mongoose = require('mongoose');
 
+//Here are the products controllers
+
 exports.products_get_all = async (req, res, next) => {
   try {
     const product = await Product.find().select('name price _id productImage');

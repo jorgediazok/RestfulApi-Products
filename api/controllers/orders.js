@@ -4,6 +4,8 @@ const checkAuth = require('../middleware/check-auth');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 
+//Here are the orders controllers
+
 exports.orders_get_all = async (req, res, next) => {
   try {
     const order = await Order.find().select('product quantity _id');
